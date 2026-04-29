@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>《秋園》詳盡人物關係圖｜經歷·血脈·命運</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f2ebe2;
+            font-family: 'Segoe UI', 'Noto Sans TC', 'Microsoft YaHei', 'WenQuanYi Micro Hei', system-ui, -apple-system, sans-serif;
+            color: #2e241f;
+            padding: 1.8rem 1rem;
+        }
+        .main-card {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fffaf5;
+            border-radius: 2rem;
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.2);
+            overflow: hidden;
+            padding: 1.6rem 1rem 1.6rem 1rem;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            border-left: 7px solid #bc7a5c;
+            padding-left: 1.2rem;
+            margin: 0 1.2rem 0.2rem 1.2rem;
+            color: #4e332b;
+        }
+        .subhead {
+            color: #8b6b5a;
+            margin: 0.2rem 2rem 1rem 2rem;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #edd9ca;
+            display: inline-block;
+            padding-bottom: 0.3rem;
+        }
+        .legend-panel {
+            margin: 0.5rem 1.2rem 1rem 1.2rem;
+            background: #fcf5ec;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .legend {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+        }
+        .legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .color-badge {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .color-badge.line {
+            width: 24px;
+            height: 3px;
+            border-radius: 4px;
+        }
+        .controls {
+            display: flex;
+            gap: 8px;
+        }
+        .controls button {
+            background: #e5d5c8;
+            border: none;
+            padding: 5px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+            color: #4f352c;
+        }
+        .controls button:hover {
+            background: #cfbaa8;
+        }
+        #graph-container {
+            width: 100%;
+            height: 720px;
+            background: #fffef8;
+            border-radius: 1.5rem;
+            border: 1px solid #ebe0d4;
+            margin-top: 0.5rem;
+            box-shadow: inset 0 0 0 1px #fff8f0, 0 6px 14px rgba(0,0,0,0.03);
+        }
+        .tooltip-rich {
+            position: fixed;
+            background: #2b241fe6;
+            backdrop-filter: blur(10px);
+            color: #fef0e4;
+            padding: 10px 16px;
+            border-radius: 28px;
+            font-size: 0.8rem;
+            line-height: 1.45;
+            max-width: 280px;
+            pointer-events: none;
+            z-index: 1000;
+            font-weight: normal;
+            letter-spacing: 0.3px;
+            border-left: 4px solid #d99472;
+            box-shadow: 0 10px 18px rgba(0,0,0,0.2);
+            transition: 0.02s linear;
+        }
+        footer {
+            text-align: center;
+            margin-top: 1.6rem;
+            font-size: 0.7rem;
+            color: #bbaa99;
+        }
+        @media (max-width: 700px) {
+            #graph-container { height: 560px; }
+            h1 { font-size: 1.5rem; }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+</head>
+<body>
+<div class="main-card">
+    <h1>秋園 · 人物脈絡與人生紀事</h1>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap:wrap;">
+        <div class="subhead">「一生嚐盡酸甜苦辣，浮木般掙扎求生」— 每個名字背後，都有一段刻骨歲月</div>
+    </div>
+    <div class="legend-panel">
+        <div class="legend">
+            <span><div class="color-badge" style="background:#bc7a5c;"></div> 秋園(核心)</span>
+            <span><div class="color-badge" style="background:#528a6e;"></div> 配偶/伴侶</span>
+            <span><div class="color-badge" style="background:#dc9e72;"></div> 子女後代</span>
+            <span><div class="color-badge" style="background:#6f96ad;"></div> 原生親屬</span>
+            <span><div class="color-badge" style="background:#a58364;"></div> 恩人/鄉親/鄰里</span>
+            <span><div class="color-badge line" style="background:#bf7b58;"></div> 連結(血緣/姻親/恩怨)</span>
+        </div>
+        <div class="controls">
+            <button id="resetViewBtn">⟳ 重置視角</button>
+            <button id="focusAutumnBtn">🍂 聚焦秋園</button>
+        </div>
+    </div>
+    <div id="graph-container"></div>
+    <footer>💡 鼠標懸浮任一人名 → 完整經歷摘要 | 可拖曳/縮放 | 關係線標明身份</footer>
+</div>
+
+<script>
+    (function() {
+        // ---------- 建構節點：包含詳細經歷記述 (desc 欄位豐富) ----------
+        // categories 分類對應 (0-4)
+        const categories = [
+            { name: '🌟 秋園 (核心)', itemStyle: { color: '#bc7a5c' } },
+            { name: '💞 配偶 / 伴侶', itemStyle: { color: '#528a6e' } },
+            { name: '👩‍👧‍👦 子女·後代', itemStyle: { color: '#dc9e72' } },
+            { name: '🏠 原生家族', itemStyle: { color: '#6f96ad' } },
+            { name: '🌾 故人·鄉鄰·恩情', itemStyle: { color: '#a58364' } }
+        ];
+
+        // 詳細節點 (增加經歷細節)
+        const nodes = [
+            { id: '秋園', name: '秋園\n(梁秋芳)', category: 0, desc: '📖 生於洛陽醫藥世家，幼時被迫裹腳後又放足。十二歲那年失去父親、兩位嫂嫂，童年驟然終結。嫁給楊仁受後從南京輾轉至湖南鄉下。一生生育五子，帶活三人，夭折夕瑩、后又痛失愛子田四。土改期間被劃為「舊官吏」家屬，屢遭批鬥、掃地出門，靠教書、做衣、討米維生。曾帶幼子逃荒至湖北，再嫁王成恩。晚年回到賜福山，八十九歲跌斷胯骨，安詳離世。性子剛毅，一生沒有被命運徹底碾碎。', symbolSize: 52 },
+            { id: '仁受', name: '楊仁受', category: 1, desc: '📜 湖南湘陰人，國民政府上校參謀，後隨政府遷都南京，與秋園結婚。為人忠厚慈悲，當鄉長時屢次救濟窮人、自掏腰包買壯丁。土改被改劃為「舊官吏」，家產沒收，體弱多病卻仍有書生氣。後餓病交加，1960年死於水腫病，去世前全身浮腫。曾因富平侵犯秋園而痛苦自責，一生未做惡事，臨終寫下「你們要活下去」。', symbolSize: 42 },
+            { id: '王成恩', name: '王成恩', category: 1, desc: '🌾 湖北漢川王家臺生產隊書記，心地善良。在秋園帶兩個幼子逃荒至湖北時接納她們，與秋園結婚。體貼照顧秋園，鼓勵她存私房錢，孝順母親王娭毑。後患嚴重哮喘，秋園日夜照料，最終服農藥自盡，擔心拖累家人。臨終囑咐秋園回湖南老家。', symbolSize: 38 },
+            { id: '子恆', name: '楊子恆\n(長子)', category: 2, desc: '📚 秋園長子，少年時成績優秀，但因家貧輟學，先後做文書、教師。為幫補家計，曾考上空軍和東北招工但因母親挽留放棄。一生從教，孝順至極，提前退休回賜福山陪伴母親。照顧弟妹，為賠三高考四處奔走。母親晚年全靠子恆在側。', symbolSize: 40 },
+            { id: '之驊', name: '楊之驊\n(作者·楊本芬)', category: 2, desc: '✍️ 秋園之女，本書作者。因家貧十二歲前未上學，後刻苦讀書考入工業學校，卻逢學校停辦。為逃離農村「外流」江西，考入共產主義勞動大學，畢業後下放農村。後嫁喬木林，生育三個子女，晚年為懷念母親開始在廚房寫作，寫出《秋園》。一生渴望讀書，三個兒女皆上大學。', symbolSize: 46 },
+            { id: '夕瑩', name: '夕瑩', category: 2, desc: '🕯️ 秋園第三個孩子，長相可愛白淨，與之驊形影不離。1948年中秋夜，吃了月餅後突發痢疾，一夜之間夭折，年僅五歲。秋園悲痛欲絕，動了胎氣，隨後生出賠三，鄉人都說是夕瑩轉世，小名賠三。', symbolSize: 30 },
+            { id: '賠三', name: '賠三\n(子恕)', category: 2, desc: '🎓 秋園幼子（夕瑩去世翌日出生），取名賠三。初中畢業因文革輟學，種田十一年。高考恢復後僅複習三天便考取湖南師範學院中文系，成為中學語文教師，繼承父親仁受「教書育人」理想。性格溫和卻有韌性。', symbolSize: 38 },
+            { id: '田四', name: '田四\n(幼子)', category: 2, desc: '💧 秋園第四子，聰明俊秀，成績優異。十五歲那年初中畢業去學校領畢業證書，歸途中與同學玩水，不幸溺亡。秋園後來帶著他的記憶遠走湖北，成為一生最痛。', symbolSize: 34 },
+            { id: '秋成', name: '梁秋成\n(大哥)', category: 3, desc: '🏮 秋園長兄，繼承葆和藥店。娶妻大嫂清婉，大嫂和二嫂在洛陽遊園會中落水身亡，父親傷心而死。秋成因此得怪病，後染大煙癮，家道中落。解放後在醫院上班，再婚。最後一次與秋園見面在洛陽，送了她五個窩窩頭。', symbolSize: 32 },
+            { id: '秋平', name: '梁秋平\n(二哥)', category: 3, desc: '⚕️ 秋園二哥，協助打理藥店雜務。妻子二嫂清揚同樣死於洛河畫舫沉船。土改時家產沒落，後續生活艱辛。', symbolSize: 30 },
+            { id: '梁先生', name: '梁掌櫃\n(父)', category: 3, desc: '🩺 秋園父親，葆和藥店掌櫃，醫術精湛，對窮人一視同仁。因兩個媳婦突然喪命，兒子病倒，悲傷過度，半個月後病故。', symbolSize: 32 },
+            { id: '梁太太', name: '梁太太\n(母)', category: 3, desc: '✂️ 秋園母親，舊式婦女，曾強行為秋園裹腳。丈夫去世後支撐家業，將秋園嫁給楊仁受。後期命運坎坷，書中未詳述終年。', symbolSize: 30 },
+            { id: '滿娭毑', name: '滿娭毑', category: 4, desc: '😤 黃泥衝惡鄰。土改複查後因為秋園家成分高，百般欺辱，逼秋園改門、要一擔谷，偷食堂糧食，日日咒罵。指使兒子富平夜間騷擾。', symbolSize: 34 },
+            { id: '滿寶生', name: '滿寶生', category: 4, desc: '👹 滿娭毑幼子，生產隊長，恃強凌弱。組織批鬥秋園，污衊她偷雞，逼她連續六晚被推搡羞辱。修建水庫時強迫村民不睡覺「消滅瞌睡」。', symbolSize: 34 },
+            { id: '小泉', name: '小泉', category: 4, desc: '🧵 童養媳出身，十四歲與國臣圓房生下畸形女兒人王。學裁縫養家，對人王不離不棄。人王後來溺水而亡，小泉悲痛一生。曾借布借錢給秋園，處處相助。', symbolSize: 32 },
+            { id: '人王', name: '人王\n(木菩薩)', category: 4, desc: '🌱 小泉之女，出生時僅五寸長，形似老鼠，智力正常但身材矮小。小泉視若珍寶，長大後依然只有孩童身量，雙搶時掉入水缸溺亡。', symbolSize: 28 },
+            { id: '四老倌', name: '四老倌', category: 4, desc: '🧂 花屋裡怪異老人，愛吃鹹魚克扣孫子。土改被劃富農，因聽信麻衣相師被傳有金子，遭吊打。家中四大缸鹽被誤作金銀挖出，身心受創。', symbolSize: 32 },
+            { id: '兵桃', name: '兵桃', category: 4, desc: '🐂 四老倌孫子，以牛欄為床，孝順勤勞。與之驊結伴討飯，曾在全隊批鬥爺爺時偷偷買肉燉湯給他吃。善良忠厚。', symbolSize: 30 },
+            { id: '邱子文', name: '邱子文', category: 4, desc: '🤝 長工，仁受好友，常幫秋園挑水劈柴。土改後分到田，收留貧苦的徐娭毑一家。為人厚道，與貴嬸收養小泉。', symbolSize: 28 },
+            { id: '陳大姐', name: '陳大姐', category: 4, desc: '🤱 湖北漢川人，在火車站遇到逃荒的秋園母子，力勸她不要回湘陰，並帶到王家臺落地。介紹秋園做裁縫，是秋園絕處逢生的恩人。', symbolSize: 28 },
+            { id: '徐娭毑', name: '徐娭毑', category: 4, desc: '🏵️ 花屋裡原女主人，慈悲善良，常體恤佃農。土改後變成地主婆，左胸患乳癌爛至碗口大，臭不可聞，依然保持尊嚴。最後痛苦死去。', symbolSize: 30 },
+            { id: '朱義生', name: '朱義生\n(跛子貨郎)', category: 4, desc: '🎁 曾因飢荒偷仁受家，仁受不但不怪罪反送米肉。後挑貨郎擔，得知秋園受難，偷偷送來米和棉絮報恩。仁受的善舉結出善果。', symbolSize: 28 },
+            { id: '喬木林', name: '喬木林', category: 4, desc: '❤️ 之驊丈夫，縣醫院職工，為人木訥老實，愛穿府綢。在之驊最艱難下放時，經月娥介紹成婚，育有三個孩子。不擅表達但支撐家庭。', symbolSize: 30 },
+            { id: '富平', name: '富平', category: 4, desc: '🌑 滿娭毑大崽，趁秋園夜裡睡著企圖侵犯，被之驊和仁受發現。仁受暴怒要殺人，秋園忍辱。富平後任隊保管員，依然作惡。', symbolSize: 28 }
+        ];
+
+        // 關係連接 (強化人物互動與故事線)
+        const links = [
+            { source: '秋園', target: '仁受', label: '結髮夫妻', lineStyle: { color: '#bf7b58', width: 2.8 } },
+            { source: '秋園', target: '王成恩', label: '患難再嫁', lineStyle: { color: '#bf7b58', width: 2.6 } },
+            { source: '秋園', target: '子恆', label: '母子 · 長子支柱', lineStyle: { color: '#dc9e72', width: 2.2 } },
+            { source: '秋園', target: '之驊', label: '母女 · 書寫者', lineStyle: { color: '#dc9e72', width: 2.2 } },
+            { source: '秋園', target: '夕瑩', label: '母女 · 早夭之痛', lineStyle: { color: '#dc9e72', width: 2.2 } },
+            { source: '秋園', target: '賠三', label: '母子 · 大學夢延續', lineStyle: { color: '#dc9e72', width: 2.2 } },
+            { source: '秋園', target: '田四', label: '母子 · 溺亡之殤', lineStyle: { color: '#dc9e72', width: 2.2 } },
+            { source: '仁受', target: '子恆', label: '父子', lineStyle: { color: '#a87b5e', width: 1.8 } },
+            { source: '仁受', target: '之驊', label: '父女 · 刷子梳辮', lineStyle: { color: '#a87b5e', width: 1.8 } },
+            { source: '仁受', target: '賠三', label: '父子', lineStyle: { color: '#a87b5e', width: 1.8 } },
+            { source: '仁受', target: '田四', label: '父子', lineStyle: { color: '#a87b5e', width: 1.8 } },
+            { source: '仁受', target: '朱義生', label: '恩情·報恩', lineStyle: { color: '#98a77b', width: 1.6, type: 'dashed' } },
+            { source: '秋園', target: '秋成', label: '兄妹 · 洛陽煙火', lineStyle: { color: '#6f96ad', width: 1.8 } },
+            { source: '秋園', target: '秋平', label: '兄妹', lineStyle: { color: '#6f96ad', width: 1.6 } },
+            { source: '秋園', target: '梁先生', label: '父女 · 早逝', lineStyle: { color: '#6f96ad', width: 1.8 } },
+            { source: '秋園', target: '梁太太', label: '母女', lineStyle: { color: '#6f96ad', width: 1.8 } },
+            { source: '滿娭毑', target: '秋園', label: '欺凌·改門逼谷', lineStyle: { color: '#af7c5e', width: 2, type: 'dashed' } },
+            { source: '滿寶生', target: '秋園', label: '批鬥推打', lineStyle: { color: '#af7c5e', width: 2, type: 'dashed' } },
+            { source: '富平', target: '秋園', label: '夜襲未遂', lineStyle: { color: '#b56447', width: 2, type: 'dotted' } },
+            { source: '小泉', target: '秋園', label: '借布做衣·互助', lineStyle: { color: '#b5946e', width: 1.6 } },
+            { source: '小泉', target: '人王', label: '母女·不離不棄', lineStyle: { color: '#b9805a', width: 2 } },
+            { source: '四老倌', target: '兵桃', label: '祖孫·牛欄相依', lineStyle: { color: '#b59a72', width: 1.8 } },
+            { source: '兵桃', target: '之驊', label: '結伴討飯·童年夥伴', lineStyle: { color: '#c6aa82', width: 1.5 } },
+            { source: '陳大姐', target: '秋園', label: '救命引路', lineStyle: { color: '#87a37c', width: 2 } },
+            { source: '徐娭毑', target: '秋園', label: '昔日房東·善緣', lineStyle: { color: '#b5946e', width: 1.5 } },
+            { source: '邱子文', target: '仁受', label: '摯友·相助', lineStyle: { color: '#9daa7c', width: 1.5 } },
+            { source: '之驊', target: '喬木林', label: '婚姻·共度時艱', lineStyle: { color: '#c28b62', width: 2 } },
+            { source: '賠三', target: '子恆', label: '兄弟扶持·送考', lineStyle: { color: '#c9a072', width: 1.6 } }
+        ];
+
+        // 節點映射
+        const nodesMap = new Map();
+        nodes.forEach(n => nodesMap.set(n.id, n));
+
+        const dom = document.getElementById('graph-container');
+        const myChart = echarts.init(dom);
+
+        const option = {
+            title: { show: false },
+            tooltip: { show: false },
+            legend: { show: false },
+            series: [{
+                type: 'graph',
+                layout: 'force',
+                force: {
+                    repulsion: 650,
+                    edgeLength: [90, 190],
+                    gravity: 0.06,
+                    friction: 0.12,
+                    layoutAnimation: true,
+                    initIterations: 320,
+                    iterations: 450
+                },
+                roam: true,
+                draggable: true,
+                data: nodes.map(node => ({
+                    id: node.id,
+                    name: node.name,
+                    category: node.category,
+                    symbolSize: node.symbolSize,
+                    label: {
+                        show: true,
+                        position: 'bottom',
+                        fontSize: 10,
+                        offset: [0, 6],
+                        color: '#442e26',
+                        fontWeight: '500',
+                        backgroundColor: 'rgba(255, 246, 236, 0.85)',
+                        padding: [2, 6, 2, 6],
+                        borderRadius: 20,
+                        borderWidth: 0,
+                        shadowBlur: 0
+                    },
+                    itemStyle: {
+                        borderColor: '#fff2e6',
+                        borderWidth: 1.8,
+                        shadowBlur: 8,
+                        shadowColor: 'rgba(0,0,0,0.15)'
+                    },
+                    desc: node.desc
+                })),
+                categories: categories,
+                links: links.map(link => ({
+                    source: link.source,
+                    target: link.target,
+                    label: { show: true, formatter: link.label, fontSize: 8, offset: [0, -8], color: '#8f684f', backgroundColor: 'rgba(250,240,228,0.85)', padding: [1, 4], borderRadius: 12 },
+                    lineStyle: {
+                        color: link.lineStyle?.color || '#bfa07e',
+                        width: link.lineStyle?.width || 1.6,
+                        type: link.lineStyle?.type || 'solid',
+                        curveness: 0.22,
+                        opacity: 0.8
+                    }
+                })),
+                emphasis: { scale: true, focus: 'adjacency' },
+                lineStyle: { curveness: 0.22 }
+            }],
+            backgroundColor: '#fffef8'
+        };
+
+        myChart.setOption(option);
+
+        // 自定義詳細tooltip
+        let tooltipDiv = null;
+        function createTooltip() {
+            const div = document.createElement('div');
+            div.className = 'tooltip-rich';
+            div.style.display = 'none';
+            document.body.appendChild(div);
+            return div;
+        }
+        tooltipDiv = createTooltip();
+
+        myChart.on('mouseover', function(params) {
+            if (params.componentType === 'series' && params.dataType === 'node') {
+                const node = params.data;
+                if (node && node.desc) {
+                    tooltipDiv.style.display = 'block';
+                    tooltipDiv.innerHTML = `<strong style="font-size:1rem;">${node.name.replace(/\n/g, '')}</strong><br>${node.desc}`;
+                    tooltipDiv.style.left = (params.event.event.clientX + 18) + 'px';
+                    tooltipDiv.style.top = (params.event.event.clientY - 40) + 'px';
+                }
+            }
+        });
+        myChart.on('mousemove', function(params) {
+            if (tooltipDiv.style.display === 'block' && params.componentType === 'series' && params.dataType === 'node') {
+                tooltipDiv.style.left = (params.event.event.clientX + 18) + 'px';
+                tooltipDiv.style.top = (params.event.event.clientY - 40) + 'px';
+            }
+        });
+        myChart.on('mouseout', function(params) {
+            if (params.componentType === 'series' && params.dataType === 'node') {
+                tooltipDiv.style.display = 'none';
+            }
+        });
+
+        // 重置視角
+        document.getElementById('resetViewBtn').addEventListener('click', () => {
+            myChart.setOption({ series: [{ roam: true, center: null, zoom: 1 }] });
+            setTimeout(() => {
+                myChart.setOption({ series: [{ force: { initIterations: 60, layoutAnimation: true } }] });
+            }, 30);
+        });
+
+        // 聚焦秋園 (中心高亮 + 軟置中)
+        document.getElementById('focusAutumnBtn').addEventListener('click', () => {
+            const optionCurrent = myChart.getOption();
+            const seriesData = optionCurrent.series[0].data;
+            let targetIdx = -1;
+            for (let i = 0; i < seriesData.length; i++) {
+                if (seriesData[i].id === '秋園') { targetIdx = i; break; }
+            }
+            if (targetIdx !== -1) {
+                myChart.dispatchAction({ type: 'highlight', seriesIndex: 0, dataIndex: targetIdx });
+                setTimeout(() => { myChart.dispatchAction({ type: 'downplay', seriesIndex: 0 }); }, 1800);
+            }
+            // 視覺中心略微往秋園偏移 (force原點不易直接指定，溫柔zoom)
+            myChart.setOption({ series: [{ center: [ '50%', '48%' ], zoom: 1.2 }] });
+        });
+
+        window.addEventListener('resize', () => myChart.resize());
+        setTimeout(() => myChart.resize(), 120);
+    })();
+</script>
+</body>
+</html>
